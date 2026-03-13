@@ -235,8 +235,6 @@ function ShareCard({ archetype, topFigure }) {
   };
 
   const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
-  const liUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(shareUrl)}&summary=${encodeURIComponent(shareText)}`;
-
   const btnBase = {
     flex: 1, padding: "12px 8px", borderRadius: 3, fontSize: 13, fontWeight: 500,
     cursor: "pointer", fontFamily: "var(--serif)", transition: "all 0.15s",
@@ -278,12 +276,6 @@ function ShareCard({ archetype, topFigure }) {
           border: "1px solid var(--rule)",
         }}>
           𝕏 Post
-        </a>
-        <a href={liUrl} target="_blank" rel="noopener noreferrer" style={{
-          ...btnBase, background: "var(--white)", color: "var(--ink)",
-          border: "1px solid var(--rule)",
-        }}>
-          LinkedIn
         </a>
       </div>
     </div>
