@@ -121,30 +121,14 @@ function findTopFigures(scores, n = 3) {
 }
 
 async function getAIAnalysis(scores, archetype, topFigures) {
-  const prompt = `You are an expert personality psychologist analyzing Big Five (OCEAN) personality test results. Be conversational, insightful, and specific. Never use bullet points.
-
-The person scored:
-- Openness: ${scores.O}th percentile
-- Conscientiousness: ${scores.C}th percentile
-- Extraversion: ${scores.E}th percentile
-- Agreeableness: ${scores.A}th percentile
-- Neuroticism: ${scores.N}th percentile
-
-Their archetype is "${archetype.name}" — ${archetype.tagline}.
-Their closest famous figure match is ${topFigures[0].name} (${topFigures[0].tag}) at ${topFigures[0].similarity}% similarity.
-
-Respond ONLY with valid JSON, no markdown, no backticks:
-{
-  "crossTraitAnalysis": "2-3 paragraphs analyzing how their specific trait COMBINATIONS interact.",
-  "archetypeExplanation": "1 paragraph explaining why they got this archetype.",
-  "figureMatchReasoning": "1 paragraph explaining WHY they matched with ${topFigures[0].name}.",
-  "tensionPoints": "1 paragraph about where their traits pull against each other.",
-  "growthEdges": "1 paragraph with 2-3 specific, actionable suggestions."
-}`;
   try {
     const res = await fetch("/api/analyze", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
+      body: JSON.stringify({
+        scores,
+        archetype: { name: archetype.name, tagline: archetype.tagline },
+        topFigure: { name: topFigures[0].name, tag: topFigures[0].tag, similarity: topFigures[0].similarity },
+      }),
     });
     if (res.status === 429) {
       const data = await res.json();

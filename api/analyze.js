@@ -70,14 +70,41 @@ export default async function handler(req) {
   }
 
   try {
-    const { prompt } = await req.json();
+    const { scores, archetype, topFigure } = await req.json();
 
-    if (!prompt || typeof prompt !== "string" || prompt.length > 5000) {
+    // Validate structured input
+    const VALID_TRAITS = ["O", "C", "E", "A", "N"];
+    if (!scores || typeof scores !== "object"
+      || !VALID_TRAITS.every(t => typeof scores[t] === "number" && scores[t] >= 0 && scores[t] <= 100)
+      || !archetype || typeof archetype.name !== "string" || typeof archetype.tagline !== "string"
+      || !topFigure || typeof topFigure.name !== "string") {
       return new Response(JSON.stringify({ error: "Invalid request" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
     }
+
+    // Build prompt server-side — client cannot inject arbitrary text
+    const prompt = `You are an expert personality psychologist analyzing Big Five (OCEAN) personality test results. Be conversational, insightful, and specific. Never use bullet points.
+
+The person scored:
+- Openness: ${scores.O}th percentile
+- Conscientiousness: ${scores.C}th percentile
+- Extraversion: ${scores.E}th percentile
+- Agreeableness: ${scores.A}th percentile
+- Neuroticism: ${scores.N}th percentile
+
+Their archetype is "${archetype.name}" — ${archetype.tagline}.
+Their closest famous figure match is ${topFigure.name} (${topFigure.tag || ""}) at ${topFigure.similarity || 0}% similarity.
+
+Respond ONLY with valid JSON, no markdown, no backticks:
+{
+  "crossTraitAnalysis": "2-3 paragraphs analyzing how their specific trait COMBINATIONS interact.",
+  "archetypeExplanation": "1 paragraph explaining why they got this archetype.",
+  "figureMatchReasoning": "1 paragraph explaining WHY they matched with ${topFigure.name}.",
+  "tensionPoints": "1 paragraph about where their traits pull against each other.",
+  "growthEdges": "1 paragraph with 2-3 specific, actionable suggestions."
+}`;
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
