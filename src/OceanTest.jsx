@@ -288,6 +288,28 @@ export default function OceanTest() {
 
   const progress = Object.keys(answers).length / QUESTIONS.length;
 
+  // Browser history management — back button returns to intro, not previous site
+  const changeScreen = useCallback((newScreen) => {
+    setScreen(newScreen);
+    if (newScreen !== "analyzing") {
+      window.history.pushState({ screen: newScreen }, "");
+    }
+  }, []);
+
+  useEffect(() => {
+    // Set initial history state
+    window.history.replaceState({ screen: "intro" }, "");
+
+    const onPopState = (e) => {
+      // Always go back to intro when user hits browser back
+      setScreen("intro"); setCurrentQ(0); setAnswers({});
+      setScores(null); setArchetype(null); setTopFigures(null);
+      setAiAnalysis(null); setAiLoading(false); setAiError(false);
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+
   const handleAnswer = useCallback((value) => {
     const next = { ...answers, [currentQ]: value };
     setAnswers(next);
@@ -298,9 +320,9 @@ export default function OceanTest() {
       const a = findArchetype(s);
       const f = findTopFigures(s, 3);
       setScores(s); setArchetype(a); setTopFigures(f);
-      setScreen("consent");
+      changeScreen("consent");
     }
-  }, [answers, currentQ]);
+  }, [answers, currentQ, changeScreen]);
 
   const handleConsent = () => {
     setScreen("analyzing");
@@ -312,16 +334,17 @@ export default function OceanTest() {
         setAiAnalysis(r); setAiLoading(false);
         if (!r) setAiError(true);
       }
-      setTimeout(() => setScreen("results"), 600);
+      setTimeout(() => changeScreen("results"), 600);
     });
   };
 
-  const handleSkipAI = () => setScreen("results");
+  const handleSkipAI = () => changeScreen("results");
 
   const handleRestart = () => {
     setScreen("intro"); setCurrentQ(0); setAnswers({});
     setScores(null); setArchetype(null); setTopFigures(null);
     setAiAnalysis(null); setAiLoading(false); setAiError(false);
+    window.history.replaceState({ screen: "intro" }, "");
   };
 
   const page = { maxWidth: 600, margin: "0 auto", padding: "48px 24px" };
@@ -373,7 +396,7 @@ export default function OceanTest() {
             <Rule />
 
             <p style={{
-              fontFamily: "var(--serif)", fontSize: 17, lineHeight: 1.75,
+              fontFamily: "var(--serif)", fontSize: 19, lineHeight: 1.75,
               color: "var(--ink-soft)", maxWidth: 400, margin: "0 auto 32px",
               fontStyle: "italic",
             }}>
@@ -383,7 +406,7 @@ export default function OceanTest() {
             {/* Trait row */}
             <div style={{
               display: "flex", gap: 0, justifyContent: "center", alignItems: "center",
-              marginBottom: 40, fontFamily: "var(--mono)", fontSize: 11,
+              marginBottom: 40, fontFamily: "var(--mono)", fontSize: 13,
               color: "var(--muted)", letterSpacing: "0.06em",
             }}>
               {TRAIT_ORDER.map((t, i) => (
@@ -396,11 +419,11 @@ export default function OceanTest() {
 
             {/* CTA */}
             <button
-              onClick={() => setScreen("test")}
+              onClick={() => changeScreen("test")}
               style={{
                 background: "var(--ink)", color: "var(--cream)",
-                border: "none", padding: "16px 48px", borderRadius: 3,
-                fontSize: 14, fontWeight: 500, cursor: "pointer",
+                border: "none", padding: "18px 52px", borderRadius: 3,
+                fontSize: 16, fontWeight: 500, cursor: "pointer",
                 fontFamily: "var(--serif)", letterSpacing: "0.04em",
                 transition: "background 0.2s",
               }}
@@ -429,8 +452,8 @@ export default function OceanTest() {
                   fontFamily: "var(--mono)", fontSize: 10, color: "var(--copper)",
                   letterSpacing: "0.1em", marginBottom: 8,
                 }}>{f.n}</div>
-                <div style={{ fontFamily: "var(--serif)", fontSize: 14, fontWeight: 700, color: "var(--ink)", marginBottom: 4 }}>{f.title}</div>
-                <div style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.55 }}>{f.body}</div>
+                <div style={{ fontFamily: "var(--serif)", fontSize: 16, fontWeight: 700, color: "var(--ink)", marginBottom: 4 }}>{f.title}</div>
+                <div style={{ fontSize: 15, color: "var(--muted)", lineHeight: 1.55 }}>{f.body}</div>
               </div>
             ))}
           </div>
