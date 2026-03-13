@@ -221,10 +221,10 @@ function Rule({ accent }) {
 // ─── SHARE CARD ─────────────────────────────────────────────────────────────
 const SITE_URL = "https://ocean-test-ten.vercel.app";
 
-function ShareCard({ archetype, scores, topFigure }) {
+function ShareCard({ archetype, topFigure }) {
   const [copied, setCopied] = useState(false);
 
-  const shareText = `${archetype.emoji} I'm ${archetype.name} — ${archetype.tagline.toLowerCase()}.\n\nMy closest match: ${topFigure.name} (${topFigure.similarity}%)\n\nO:${scores.O} · C:${scores.C} · E:${scores.E} · A:${scores.A} · N:${scores.N}\n\nTake the OCEAN personality test:`;
+  const shareText = `${archetype.emoji} I'm ${archetype.name} — ${archetype.tagline.toLowerCase()}.\n\n"${archetype.brief}"\n\nClosest famous match: ${topFigure.name} (${topFigure.tag})\n\nWhat's your ocean current? Free AI personality test by TensorShift:`;
 
   const shareUrl = SITE_URL;
 
@@ -235,7 +235,7 @@ function ShareCard({ archetype, scores, topFigure }) {
   };
 
   const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
-  const liUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
+  const liUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(`${shareText}\n${shareUrl}`)}`;
 
   const btnBase = {
     flex: 1, padding: "12px 8px", borderRadius: 3, fontSize: 13, fontWeight: 500,
@@ -879,7 +879,7 @@ export default function OceanTest() {
           </div>
 
           {/* Share & Actions */}
-          <ShareCard archetype={archetype} scores={scores} topFigure={topFigures[0]} />
+          <ShareCard archetype={archetype} topFigure={topFigures[0]} />
 
           <button onClick={handleRestart} style={{
             width: "100%", background: "var(--white)", color: "var(--ink-soft)",
