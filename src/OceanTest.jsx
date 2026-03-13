@@ -218,6 +218,78 @@ function Rule({ accent }) {
   );
 }
 
+// ─── SHARE CARD ─────────────────────────────────────────────────────────────
+const SITE_URL = "https://ocean-test-ten.vercel.app";
+
+function ShareCard({ archetype, scores, topFigure }) {
+  const [copied, setCopied] = useState(false);
+
+  const shareText = `${archetype.emoji} I'm ${archetype.name} — ${archetype.tagline.toLowerCase()}.\n\nMy closest match: ${topFigure.name} (${topFigure.similarity}%)\n\nO:${scores.O} · C:${scores.C} · E:${scores.E} · A:${scores.A} · N:${scores.N}\n\nTake the OCEAN personality test:`;
+
+  const shareUrl = SITE_URL;
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+  const liUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
+
+  const btnBase = {
+    flex: 1, padding: "12px 8px", borderRadius: 3, fontSize: 13, fontWeight: 500,
+    cursor: "pointer", fontFamily: "var(--serif)", transition: "all 0.15s",
+    textDecoration: "none", textAlign: "center", display: "flex",
+    alignItems: "center", justifyContent: "center", gap: 6,
+  };
+
+  return (
+    <div style={{
+      background: "var(--white)", border: "1px solid var(--rule)", borderRadius: 4,
+      padding: "24px 20px", marginBottom: 16, boxShadow: "0 1px 3px rgba(28,42,58,0.04)",
+      animation: "fadeUp 0.5s ease-out 0.5s both",
+    }}>
+      <div style={{
+        fontSize: 10, fontWeight: 500, color: "var(--copper)", marginBottom: 14,
+        letterSpacing: "0.14em", fontFamily: "var(--mono)", textTransform: "uppercase",
+      }}>
+        Share Your Current
+      </div>
+
+      <div style={{
+        background: "var(--warm-bg)", borderRadius: 3, padding: "14px 16px", marginBottom: 16,
+        fontFamily: "var(--mono)", fontSize: 12, color: "var(--ink-soft)", lineHeight: 1.6,
+        whiteSpace: "pre-line",
+      }}>
+        {shareText}
+      </div>
+
+      <div style={{ display: "flex", gap: 8 }}>
+        <button onClick={handleCopy} style={{
+          ...btnBase,
+          background: copied ? "var(--teal)" : "var(--ink)",
+          color: "var(--cream)", border: "none",
+        }}>
+          {copied ? "Copied!" : "Copy"}
+        </button>
+        <a href={xUrl} target="_blank" rel="noopener noreferrer" style={{
+          ...btnBase, background: "var(--white)", color: "var(--ink)",
+          border: "1px solid var(--rule)",
+        }}>
+          𝕏 Post
+        </a>
+        <a href={liUrl} target="_blank" rel="noopener noreferrer" style={{
+          ...btnBase, background: "var(--white)", color: "var(--ink)",
+          border: "1px solid var(--rule)",
+        }}>
+          LinkedIn
+        </a>
+      </div>
+    </div>
+  );
+}
+
 // ─── CSS ─────────────────────────────────────────────────────────────────────
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=DM+Mono:wght@400;500&display=swap');
@@ -460,12 +532,17 @@ export default function OceanTest() {
 
           {/* Footer */}
           <div style={{ textAlign: "center", borderTop: "1px solid var(--rule)", paddingTop: 20 }}>
-            <p style={{ color: "var(--faint)", fontSize: 10, fontFamily: "var(--mono)", lineHeight: 1.7, maxWidth: 440, margin: "0 auto" }}>
+            <p style={{ color: "var(--faint)", fontSize: 10, fontFamily: "var(--mono)", lineHeight: 1.7, maxWidth: 440, margin: "0 auto 10px" }}>
               Items adapted from the Big Five Inventory (BFI; John, Donahue, & Kentle, 1991).
               Copyright Oliver P. John. Non-commercial educational use.
               Archetypes, AI analysis, and celebrity matching are original to TensorShift LLC.
               Educational tool — not a clinical assessment. No data collected or stored.
             </p>
+            <div style={{ display: "flex", justifyContent: "center", gap: 16, fontFamily: "var(--mono)", fontSize: 10 }}>
+              <a href="https://tensorshift.ai" target="_blank" rel="noopener noreferrer" style={{ color: "var(--copper)", textDecoration: "none" }}>tensorshift.ai</a>
+              <a href="https://tensorshift.ai/terms" target="_blank" rel="noopener noreferrer" style={{ color: "var(--faint)", textDecoration: "none" }}>Terms</a>
+              <a href="https://tensorshift.ai/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "var(--faint)", textDecoration: "none" }}>Privacy</a>
+            </div>
           </div>
         </div>
       </div>
@@ -801,7 +878,9 @@ export default function OceanTest() {
             </p>
           </div>
 
-          {/* Actions */}
+          {/* Share & Actions */}
+          <ShareCard archetype={archetype} scores={scores} topFigure={topFigures[0]} />
+
           <button onClick={handleRestart} style={{
             width: "100%", background: "var(--white)", color: "var(--ink-soft)",
             border: "1px solid var(--rule)", padding: "15px 20px", borderRadius: 3,
@@ -821,9 +900,11 @@ export default function OceanTest() {
               Non-commercial educational use. Archetypes and AI analysis are original to TensorShift LLC.
               Educational and entertainment purposes only. Not a clinical assessment.
             </p>
-            <p style={{ color: "var(--faint)", fontSize: 10, fontFamily: "var(--mono)" }}>
-              An educational product by TensorShift LLC
-            </p>
+            <div style={{ display: "flex", justifyContent: "center", gap: 16, fontFamily: "var(--mono)", fontSize: 10, marginBottom: 8 }}>
+              <a href="https://tensorshift.ai" target="_blank" rel="noopener noreferrer" style={{ color: "var(--copper)", textDecoration: "none" }}>tensorshift.ai</a>
+              <a href="https://tensorshift.ai/terms" target="_blank" rel="noopener noreferrer" style={{ color: "var(--faint)", textDecoration: "none" }}>Terms</a>
+              <a href="https://tensorshift.ai/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "var(--faint)", textDecoration: "none" }}>Privacy</a>
+            </div>
           </div>
         </div>
       </div>
