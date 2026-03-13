@@ -235,7 +235,7 @@ function ShareCard({ archetype, topFigure }) {
   };
 
   const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
-  const liUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(`${shareText}\n${shareUrl}`)}`;
+  const liUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(shareUrl)}&summary=${encodeURIComponent(shareText)}`;
 
   const btnBase = {
     flex: 1, padding: "12px 8px", borderRadius: 3, fontSize: 13, fontWeight: 500,
